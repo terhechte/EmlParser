@@ -272,9 +272,10 @@ impl EmlParser {
             )))
         } else {
             self.position = end_position;
-            Ok(Some(String::from(
-                &self.content[start_position..end_position],
-            )))
+
+            let substring = self.content.get(start_position..end_position)
+                .map(|s| s.to_string());
+            Ok(substring)
         }
     }
 
@@ -425,8 +426,11 @@ impl EmlParser {
             _ => false,
         };
 
+        let substring = &self.content.get(start_position..value_end)
+            .ok_or(EmlError::UnexpectedContent("Unicode Error".to_string()))?;
+
         Ok((
-            String::from(&self.content[start_position..value_end]),
+            substring.to_string(),
             end_of_header,
         ))
     }
